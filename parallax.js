@@ -1,46 +1,47 @@
-var ratio = 3;
+var ratio = 1.2;
+var lastScrollTop = 0;
+// element should be replaced with the actual target element on which you have applied scroll, use window in case of no target element.
+var bg = document.getElementById('bg-img');
+var wrapper = document.getElementById('wrapper');
+
+function isScrolledIntoView(el) {
+  var elemTop = el.getBoundingClientRect().top;
+  var elemBottom = el.getBoundingClientRect().bottom;
+
+  var isVisible = elemTop < window.innerHeight && elemBottom >= 0
+  return isVisible;
+}
+
+window.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
+  var st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
+  if (st > lastScrollTop){
+   // downscroll code
+   adjustY(true);
+  } else {
+   // upscroll code
+   adjustY(false);
+  }
+  lastScrollTop = st;
+}, false);
 
 
-function adjustY() {
+function adjustY(scrollingDown) {
+  var el = document.getElementById('wrapper');
+  var wrapperTop = el.getBoundingClientRect().top;
+  var imageOffset;
+  var imageOffsetCalc = (-wrapperTop * ratio);
 
-  var scrollY = window.scrollY;
-  var imageOffset = (-scrollY * ratio) + scrollY;
-  var img = document.getElementById('bg-img');
-  var wrapper = document.getElementById('wrapper');
-  if (shouldScroll(img, wrapper)) {
-    img.style.transform = 'translateY(' + imageOffset + 'px)';
+  if (!isScrolledIntoView(el)) {
+    return;
   }
 
-}
+  if (imageOffsetCalc < -345) {
+    imageOffset = -345;
+  } else if (imageOffsetCalc > 0) {
+    imageOffset = 0;
+  } else {
+    imageOffset = imageOffsetCalc;
+  }
 
-function offset(el) {
-  var rect = el.getBoundingClientRect();
-  scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-  scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  return { top: rect.top + scrollTop, left: rect.left + scrollLeft };
-}
-
-function shouldScroll(bg, wrapper) {
-  var imgTop = offset(bg).top;
-  var imgBottom = imgTop + bg.height;
-  var wrapperTop = offset(wrapper).top;
-  var wrapperBottom = wrapperTop + wrapper.offsetHeight;
-  console.log('scrollY', window.scrollY);
-  // console.log('imgTop', imgTop);
-  // console.log('imgBottom', imgBottom);
-  // console.log('wrapperTop', wrapperTop);
-  // console.log('wrapperBottom', wrapperBottom);
-  console.log('wrapperBottom - imgBottom', wrapperBottom - imgBottom);
-  console.log('wrapperTop - imgTop', wrapperTop - imgTop);
-  var withinBottom = wrapperBottom - imgBottom <= 100;
-  var withinTop = wrapperTop - imgTop >= -100;
-  return withinTop && withinBottom;
-}
-
-function shouldScrollDown(bg, wrapper) {
-
-}
-
-function shouldScrollUp(bg, wrapper) {
-
+  bg.style.transform = 'translateY(' + imageOffset + 'px)';
 }
