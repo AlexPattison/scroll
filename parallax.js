@@ -1,47 +1,40 @@
-var ratio = 1.2;
-var lastScrollTop = 0;
-// element should be replaced with the actual target element on which you have applied scroll, use window in case of no target element.
-var bg = document.getElementById('bg-img');
-var wrapper = document.getElementById('wrapper');
+window.onload = function() {
+  var ratio = .3;
+  var bg = document.getElementById('bg-img');
+  var wrapper = document.getElementById('wrapper');
+  var maxOffset = bg.getBoundingClientRect().height - wrapper.clientHeight;
 
-function isScrolledIntoView(el) {
-  var elemTop = el.getBoundingClientRect().top;
-  var elemBottom = el.getBoundingClientRect().bottom;
+  function isScrolledIntoView(el) {
+    var elemTop = el.getBoundingClientRect().top;
+    var elemBottom = el.getBoundingClientRect().bottom;
 
-  var isVisible = elemTop < window.innerHeight && elemBottom >= 0
-  return isVisible;
-}
-
-window.addEventListener("scroll", function(){ // or window.addEventListener("scroll"....
-  var st = window.pageYOffset || document.documentElement.scrollTop; // Credits: "https://github.com/qeremy/so/blob/master/so.dom.js#L426"
-  if (st > lastScrollTop){
-   // downscroll code
-   adjustY(true);
-  } else {
-   // upscroll code
-   adjustY(false);
-  }
-  lastScrollTop = st;
-}, false);
-
-
-function adjustY(scrollingDown) {
-  var el = document.getElementById('wrapper');
-  var wrapperTop = el.getBoundingClientRect().top;
-  var imageOffset;
-  var imageOffsetCalc = (-wrapperTop * ratio);
-
-  if (!isScrolledIntoView(el)) {
-    return;
+    var isVisible = elemTop < window.innerHeight && elemBottom >= 0
+    return isVisible;
   }
 
-  if (imageOffsetCalc < -345) {
-    imageOffset = -345;
-  } else if (imageOffsetCalc > 0) {
-    imageOffset = 0;
-  } else {
-    imageOffset = imageOffsetCalc;
-  }
+  window.addEventListener("scroll", function(){
+    adjustY();
+  }, false);
 
-  bg.style.transform = 'translateY(' + imageOffset + 'px)';
+
+  function adjustY() {
+    var el = document.getElementById('wrapper');
+    var wrapperBottom = el.getBoundingClientRect().bottom;
+    var imageOffset;
+    var imageOffsetCalc = (-wrapperBottom * ratio);
+
+    if (!isScrolledIntoView(el)) {
+      return;
+    }
+
+    if (imageOffsetCalc < -maxOffset) {
+      imageOffset = -maxOffset;
+    } else if (imageOffsetCalc > 0) {
+      imageOffset = 0;
+    } else {
+      imageOffset = imageOffsetCalc;
+    }
+
+    bg.style.transform = 'translateY(' + imageOffset + 'px)';
+  }
 }
